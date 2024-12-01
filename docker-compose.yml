@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+  mydb:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_DB: "${DB_NAME}"
+      DB_HOST: "${RDS_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_NAME: "${DB_NAME}"
+    container_name: mydb
+    volumes:
+      - db-store:/var/lib/postgresql/data
+      - ./logs:/var/log/postgresql:z
+    networks:
+      - app_net
+    restart: on-failure:5
+
+  # Rust
+  myrust:
+    build:
+      context: .
+      dockerfile: ./docker/rust/Dockerfile
+    working_dir: /backend
+    expose:
+      - "${BACKEND_PORT}"
+    environment:
+      - TZ=UTC
+      - DB_HOST=${RDS_HOST}    # RDSホスト名を環境変数として渡す
+      - DB_PORT=5432           # RDSポート
+      - DB_USER=${DB_USER}     # RDSユーザー名
+      - DB_PASSWORD=${DB_PASSWORD}  # RDSパスワード
+      - DB_NAME=${DB_NAME}     # RDSデータベース名
+    volumes:
+      # log
+      - ./logs:/backend/log
+      # Rust code
+      - ./backend/src:/backend/src
+      - ./backend/Cargo.lock:/backend/Cargo.lock
+      - ./backend/Cargo.toml:/backend/Cargo.toml
+    command: /backend/target/release/backend
+    container_name: myrust
+    networks:
+      - app_net
+    restart: on-failure:5
+
+  # Next.js
+  mynext:
+    container_name: mynext
+    build:
+      context: .
+      dockerfile: ./docker/nextjs/Dockerfile
+    restart: on-failure:5
+    volumes:
+      - ./frontend/out:/frontend/out
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    networks:
+      - app_net
+
+  # nginx
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      - myrust
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+    volumes:
+      # Rust code
+      - ./backend/src:/backend/src
+      # Next.js code
+      - ./frontend/out:/frontend/out
+      - ./backend/Cargo.lock:/backend/Cargo.lock
+      - ./backend/Cargo.toml:/backend/Cargo.toml
+      # log
+      - ./logs:/var/log/nginx:z
+      # nginx config
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    container_name: nginx
+    networks:
+      - app_net
+    restart: on-failure:5
+
+networks:
+  app_net:
+    driver: "bridge"
+
+volumes:
+  db-store:
