@@ -22,6 +22,8 @@ import {
 } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+const API_URL = process.env.API_URL;
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
@@ -29,11 +31,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // 新規登録
   const signup = async (name: string, email: string, password: string) => {
     const signupRequest: SignupRequest = { name, email, password };
 
     try {
-      await axios.post("/api/auth/signup", signupRequest);
+      await axios.post(API_URL + "/api/auth/signup", signupRequest);
 
       // サインアップ成功後の処理
       return true;
@@ -105,9 +108,10 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  // Eメール認証
   const verifyEmail = async (token: string) => {
     try {
-      const response = await axios.get(`/api/auth/verify_email?token=${token}`);
+      const response = await axios.get(API_URL + `/api/auth/verify_email?token=${token}`);
 
       if (response.data) {
         console.log("メールアドレスが確認されました。");
@@ -123,11 +127,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  // ログイン
   const login = async (name: string, email: string, password: string) => {
     const loginRequest: LoginRequest = { name, email, password };
 
     try {
-      const response = await axios.post("/api/auth/login", loginRequest);
+      const response = await axios.post(API_URL + "/api/auth/login", loginRequest);
 
       const loginUserData = response.data;
       loginUserData.sub = loginUserData.name;
@@ -204,6 +209,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  // 現在の認証ユーザーを取得
   const getCurrentUser = async (): Promise<User | false> => {
     try {
       const token = window.localStorage.getItem("login_token");
@@ -211,7 +217,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         console.log(token);
         return false;
       }
-      const response = await axios.get("/api/auth/current_user", {
+      const response = await axios.get(API_URL + "/api/auth/current_user", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -226,6 +232,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  // ゲストログイン
   const guestLogin = async () => {
     // ゲストログイン用データ
     const name = "test_user1";
@@ -233,7 +240,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const password = "Password123";
 
     try {
-      const response = await axios.post("/api/auth/guest_login", {
+      const response = await axios.post(API_URL + "/api/auth/guest_login", {
         name,
         email,
         password,

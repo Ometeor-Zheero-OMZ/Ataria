@@ -1,9 +1,11 @@
 import axios from "axios";
 
-// Fetch tasks
+const API_URL = process.env.API_URL;
+
+// タスク取得
 export const fetchTasks = async (token: string) => {
   try {
-    const response = await axios.get("/api/todos", {
+    const response = await axios.get(API_URL + "/api/todos", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -12,7 +14,7 @@ export const fetchTasks = async (token: string) => {
   }
 };
 
-// Add task
+// タスク追加
 export const addTask = async (
   token: string,
   title: string,
@@ -20,7 +22,7 @@ export const addTask = async (
 ) => {
   try {
     await axios.post(
-      "/api/todo",
+      API_URL + "/api/todo",
       { title, description },
       {
         headers: {
@@ -34,10 +36,10 @@ export const addTask = async (
   }
 };
 
-// Update task
+// タスク更新
 export const updateTask = async (token: string, updatedTask: any) => {
   try {
-    await axios.post("/api/todo", updatedTask, {
+    await axios.post(API_URL + "/api/todo", updatedTask, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -48,10 +50,10 @@ export const updateTask = async (token: string, updatedTask: any) => {
   }
 };
 
-// Delete task
+// タスク削除
 export const deleteTask = async (token: string, taskId: number) => {
   try {
-    await axios.delete("/api/todo", {
+    await axios.delete(API_URL + "/api/todo", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -63,11 +65,11 @@ export const deleteTask = async (token: string, taskId: number) => {
   }
 };
 
-// Change task status
+// タスクステータス更新
 export const changeTaskStatus = async (token: string, taskId: number) => {
   try {
     await axios.post(
-      "/api/todo/complete",
+      API_URL + "/api/todo/complete",
       { id: taskId },
       {
         headers: {
