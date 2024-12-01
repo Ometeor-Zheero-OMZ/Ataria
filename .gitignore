@@ -1,0 +1,9 @@
+.vscode
+.vscode/*
+backend/target
+backend/.env
+backend/Makefile
+backend/client.http
+backend/Cargo.lock
+.env
+.dockerignore

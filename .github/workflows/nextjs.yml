@@ -1,0 +1,43 @@
+name: Next.js Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: List Files
+        run: |
+          ls -la
+          ls -la frontend
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-build-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build Application
+        run: |
+          cd frontend
+          npm run build
