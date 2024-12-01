@@ -71,21 +71,22 @@ export default function Home() {
         }}
       >
         <div className="w-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <h1 className="text-[80px] text-[#ddd] font-light mb-[30px] animate-moveToLeft font-dm">
+          <h1 className="font-teko text-[100px] text-[#ddd] font-light mb-[30px] animate-moveToLeft">
             Harness{" "}
             <span className="text-white font-dotGothic16 font-normal uppercase text-center m-0 animate-shadows text-[calc(2rem+5vw)] tracking-[0.4rem]">
               Ataria
             </span>
           </h1>
-          <p className="font-teko text-6xl font-bold text-light mb-20 animate-moveToRight tracking-wider sm:text-5xl md:text-5xl lg:text-6xl">
+          <p className="font-teko text-6xl font-bold text-[#ddd] text-light mb-20 animate-moveToRight tracking-wider sm:text-5xl md:text-5xl lg:text-6xl">
             Share Your Game
           </p>
-          <OutlineButton
+          <SimpleColorfulButton
             title="Guest Login"
-            position="right"
-            icon={<FaLocationArrow />}
+            // position="right"
+            // icon={<FaLocationArrow />} // 矢印アイコン
             handleClick={handleGuestLogin}
             aria-label="Guest Login"
+            otherClasses=""
           />
           <SimpleColorfulButton
             title="Get Started"
